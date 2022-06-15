@@ -17,6 +17,8 @@ and now install the dependencies by using
 $ pip install -r requirements.txt
 ```
 
+To run the notebook using Jupyter notebooks you can run `jupyter notebook` and then open `handwriting.ipynb` file.
+
 ## Project Organization
 
 ```
