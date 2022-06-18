@@ -3,9 +3,11 @@ import matplotlib.pyplot as plot
 import numpy as np
 import cv2
 import os
+import gtts
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
+from playsound import playsound
 
 IMAGE_SIZE=28
 
