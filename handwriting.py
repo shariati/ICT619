@@ -113,10 +113,10 @@ if not os.path.exists('./model/saved_model.pb'):
 else:
     # load existing model
     print("Existing trained model found.")
-    #playsound(MODEL_FOUND)
+    playsound(MODEL_FOUND)
 
     print("Loading model...")
-    #playsound(LOADING_EXISTING_MODEL)
+    playsound(LOADING_EXISTING_MODEL)
 
     dnnModel = tf.keras.models.load_model('./model/')
 
@@ -130,6 +130,7 @@ yourImage = tf.keras.utils.normalize(yourImage, axis= 1)
 yourImage = np.array(yourImage).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
 prediction = dnnModel.predict(yourImage)
 digit = np.argmax(prediction)
+print(digit)
 
 if os.path.exists(DETECTED_DIGIT):
     os.remove(DETECTED_DIGIT)
