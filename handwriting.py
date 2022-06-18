@@ -59,8 +59,7 @@ if not os.path.exists('./model/saved_model.pb'):
     image_train.shape
 
     plot.imshow(image_train[0])
-    plot.show()
-    plot.imshow(image_train[3], cmap= plot.cm.binary)
+    plot.imshow(image_train[0], cmap= plot.cm.binary)
 
     image_train = tf.keras.utils.normalize(image_train, axis=1)
     image_test = tf.keras.utils.normalize(image_test, axis=1)
