@@ -24,6 +24,7 @@ To run the notebook using Jupyter notebooks you can run `jupyter notebook` and t
 ```
 ├── img\                    <- Images used in the Jupyter notebook
 ├── model\                  <- Location of trained model
+├── voice\                  <- Location of generated text to speach audio
 ├── .gitignore              <- A set rules to mark files that should be ignored to pushed to git repository
 ├── handwriting.ipynb       <- Jupyter notebook for Handwritten DIGITalization project
 ├── README.md               <- A guide on how to use this project
