@@ -9,11 +9,50 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
 from playsound import playsound
 
-IMAGE_SIZE=28
+# Constants and initial configurations
+IMAGE_SIZE = 28
+MODEL_NOT_FOUND = './voice/model-not-found.mp3'
+START_TRAINING_PROCESS = './voice/start-training-process.mp3'
+MODEL_FOUND = './voice/model-found.mp3'
+LOADING_EXISTING_MODEL = './voice/loading-existing-model.mp3'
+RUNNING_APPLICATION = './voice/running-prototype.mp3'
+HANDWRITING_DETECTED = './voice/handwriting-detected.mp3'
+DETECTED_DIGIT = './voice/detected-digit.mp3'
+LANGUAGE = 'en'
+
+# Create Speech files
+if not os.path.exists(MODEL_NOT_FOUND):
+    tts = gtts.gTTS("Couldn't find trained Model.")
+    tts.save(MODEL_NOT_FOUND)
+
+if not os.path.exists(START_TRAINING_PROCESS):
+    tts = gtts.gTTS("Starting training process!")
+    tts.save(START_TRAINING_PROCESS)
+
+if not os.path.exists(MODEL_FOUND):
+    tts = gtts.gTTS("Existing trained model found!")
+    tts.save(MODEL_FOUND)
+
+if not os.path.exists(LOADING_EXISTING_MODEL):
+    tts = gtts.gTTS("Loading model.")
+    tts.save(LOADING_EXISTING_MODEL)
+
+if not os.path.exists(RUNNING_APPLICATION):
+    tts = gtts.gTTS("Running Prototype")
+    tts.save(RUNNING_APPLICATION)
+
+if not os.path.exists(HANDWRITING_DETECTED):
+    tts = gtts.gTTS("I can see")
+    tts.save(HANDWRITING_DETECTED)
+
+MODEL_NOT_FOUND='./voice/model-not-found.mp3'
 
 if not os.path.exists('./model/saved_model.pb'):
     print("Couldn't find trained Model.")
+    playsound(MODEL_NOT_FOUND)
+
     print("Starting training process ...")
+    playsound(START_TRAINING_PROCESS)
 
     handDigitalizationDataset = tf.keras.datasets.mnist
     (image_train, label_train), (image_test, label_test) = handDigitalizationDataset.load_data()
@@ -74,16 +113,28 @@ if not os.path.exists('./model/saved_model.pb'):
 else:
     # load existing model
     print("Existing trained model found.")
+    #playsound(MODEL_FOUND)
+
     print("Loading model...")
+    #playsound(LOADING_EXISTING_MODEL)
+
     dnnModel = tf.keras.models.load_model('./model/')
 
 # Prototype
 
 print ("Running Prototype")
-yourImage = cv2.imread('./img/handwritten-number.jpg')
+yourImage = cv2.imread('./img/test-input-number.jpg')
 yourImage = cv2.cvtColor(yourImage, cv2.COLOR_BGR2GRAY)
 yourImage = cv2.resize(yourImage, (IMAGE_SIZE,IMAGE_SIZE), interpolation=cv2.INTER_AREA)
 yourImage = tf.keras.utils.normalize(yourImage, axis= 1)
 yourImage = np.array(yourImage).reshape(-1, IMAGE_SIZE, IMAGE_SIZE, 1)
 prediction = dnnModel.predict(yourImage)
-print(np.argmax(prediction))
+digit = np.argmax(prediction)
+
+if os.path.exists(DETECTED_DIGIT):
+    os.remove(DETECTED_DIGIT)
+
+tts = gtts.gTTS(str(digit))
+tts.save(DETECTED_DIGIT)
+playsound(HANDWRITING_DETECTED)
+playsound(DETECTED_DIGIT)
