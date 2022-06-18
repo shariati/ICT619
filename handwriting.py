@@ -73,7 +73,7 @@ else:
     # load existing model
     print("Existing trained model found.")
     print("Loading model...")
-    trainedModel = tf.keras.models.load_model('./model/')
+    dnnModel = tf.keras.models.load_model('./model/')
 
 # Prototype
 
