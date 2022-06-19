@@ -31,6 +31,15 @@ To run the notebook using Jupyter notebooks you can run `jupyter notebook` and t
 ├── requirements.txt        <- The requirements file for reproducing the analysis environment
 ```
 
+## Developers
+This project has been written for ICT619 Artificial Intelligence (tma, 2022)
+
+Group Assignment1 
+*Group 12*
+- Amin Shariati Saravi (34258909)
+- Xiaoxian (Abbie) Chen (34320816)
+
+
 ## Libraries
 - absl-py==1.0.0
 - appnope==0.1.3
