@@ -4,6 +4,9 @@ import numpy as np
 import cv2
 import os
 import gtts
+import time
+
+from PIL import Image
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
@@ -11,6 +14,7 @@ from playsound import playsound
 
 # Constants and initial configurations
 IMAGE_SIZE = 28
+BOX_SIZE = 160
 MODEL_NOT_FOUND = './voice/model-not-found.mp3'
 START_TRAINING_PROCESS = './voice/start-training-process.mp3'
 MODEL_FOUND = './voice/model-found.mp3'
@@ -19,6 +23,9 @@ RUNNING_APPLICATION = './voice/running-prototype.mp3'
 HANDWRITING_DETECTED = './voice/handwriting-detected.mp3'
 DETECTED_DIGIT = './voice/detected-digit.mp3'
 LANGUAGE = 'en'
+VIEW_PORT_WIDTH = 640
+VIEW_PORT_HEIGHT = 480
+
 
 # Create Speech files
 if not os.path.exists(MODEL_NOT_FOUND):
@@ -112,10 +119,10 @@ if not os.path.exists('./model/saved_model.pb'):
 else:
     # load existing model
     print("Existing trained model found.")
-    playsound(MODEL_FOUND)
+    # playsound(MODEL_FOUND)
 
     print("Loading model...")
-    playsound(LOADING_EXISTING_MODEL)
+    # playsound(LOADING_EXISTING_MODEL)
 
     dnnModel = tf.keras.models.load_model('./model/')
 
@@ -136,5 +143,73 @@ if os.path.exists(DETECTED_DIGIT):
 
 tts = gtts.gTTS(str(digit))
 tts.save(DETECTED_DIGIT)
-playsound(HANDWRITING_DETECTED)
-playsound(DETECTED_DIGIT)
+#playsound(HANDWRITING_DETECTED)
+#playsound(DETECTED_DIGIT)
+
+# threshold slider handler 
+threshold = 150
+
+# Read from camera
+cap = cv2.VideoCapture(0)
+
+# Set view port size e.g. 640 x 480
+cap.set(3, VIEW_PORT_WIDTH)
+cap.set(4, VIEW_PORT_HEIGHT)
+
+# Set window name
+originalWindow = cv2.namedWindow('Live Camera Feed')
+processedWindow = cv2.namedWindow('Processed')
+background = np.zeros((VIEW_PORT_HEIGHT, VIEW_PORT_WIDTH), np.uint8)
+frameCount = 0
+
+# Predict function
+def predict(model, img):
+    imgs = np.array([img])
+    res = model.predict(imgs)
+    index = np.argmax(res)
+    #print(index)
+    return str(index)
+
+# Keep looping to get a live stream
+while True:
+    ret, frame = cap.read()
+    # frame counter for showing text 
+    frameCount += 1
+    # black outer frame
+    frame[0:VIEW_PORT_HEIGHT, 0:80] = 0
+    frame[0:VIEW_PORT_HEIGHT, 560:VIEW_PORT_WIDTH] = 0
+        
+    
+    grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    plot.imshow(grayFrame)
+        
+    # apply threshold
+    _, thr = cv2.threshold(grayFrame, threshold, 255, cv2.THRESH_BINARY_INV)
+    # get central image 
+    resizedProcessedFrame = thr[(VIEW_PORT_HEIGHT//2)-75:(VIEW_PORT_HEIGHT//2)+75, (VIEW_PORT_WIDTH//2)-75:(VIEW_PORT_WIDTH//2)+75]
+    background[(VIEW_PORT_HEIGHT//2)-75:(VIEW_PORT_HEIGHT//2)+75, (VIEW_PORT_WIDTH//2)-75:(VIEW_PORT_WIDTH//2)+75] = resizedProcessedFrame
+    # resize for inference 
+    iconImg = cv2.resize(resizedProcessedFrame, (28, 28))
+
+
+    # Pass to model predictor 
+    predictedNumber = predict(dnnModel,iconImg)
+        
+    # Clear background 
+    if frameCount == 10:
+        background[0:480, 0:80] = 0
+        frameCount = 0
+        cv2.putText(img=background, text=predictedNumber, org= (10, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=2, color=(255, 235, 42), thickness=3)
+
+    # Show text 
+    cv2.putText(img=background, text="I can see", org= (10,30), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(255, 235, 42), thickness=1)
+    cv2.putText(img=background, text="Press q to quit", org= (VIEW_PORT_HEIGHT, 455), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=1, color=(255, 255, 255), thickness=1)
+    cv2.rectangle(background, ((VIEW_PORT_WIDTH//2)-(BOX_SIZE//2), (VIEW_PORT_HEIGHT//2)-(BOX_SIZE//2)), ((VIEW_PORT_WIDTH//2)+(BOX_SIZE//2), (VIEW_PORT_HEIGHT//2)+(BOX_SIZE//2)), (255, 235, 42), thickness=2)
+            
+    # display frame 
+    cv2.imshow(processedWindow, background)
+    cv2.imshow('Live Camera Feed', frame)
+    if cv2.waitKey(1) & 0xff == ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()
