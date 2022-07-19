@@ -140,8 +140,8 @@ print(digit)
 if os.path.exists(DETECTED_DIGIT):
     os.remove(DETECTED_DIGIT)
 
-tts = gtts.gTTS(str(digit))
-tts.save(DETECTED_DIGIT)
+#tts = gtts.gTTS(str(digit))
+#tts.save(DETECTED_DIGIT)
 #playsound(HANDWRITING_DETECTED)
 #playsound(DETECTED_DIGIT)
 
@@ -189,7 +189,6 @@ while True:
     # resize for inference 
     iconImg = cv2.resize(resizedProcessedFrame, (28, 28))
 
-
     # Pass to model predictor 
     predictedNumber = predict(dnnModel,iconImg)
         
@@ -205,7 +204,7 @@ while True:
     cv2.rectangle(background, ((VIEW_PORT_WIDTH//2)-(BOX_SIZE//2), (VIEW_PORT_HEIGHT//2)-(BOX_SIZE//2)), ((VIEW_PORT_WIDTH//2)+(BOX_SIZE//2), (VIEW_PORT_HEIGHT//2)+(BOX_SIZE//2)), (255, 235, 42), thickness=2)
             
     # display frame 
-    cv2.imshow(processedWindow, background)
+    cv2.imshow('Processed', background)
     cv2.imshow('Live Camera Feed', frame)
     if cv2.waitKey(1) & 0xff == ord('q'):
         break
