@@ -127,7 +127,6 @@ else:
     dnnModel = tf.keras.models.load_model('./model/')
 
 # Prototype
-
 print ("Running Prototype")
 yourImage = cv2.imread('./img/test-input-number.jpg')
 yourImage = cv2.cvtColor(yourImage, cv2.COLOR_BGR2GRAY)
@@ -167,7 +166,6 @@ def predict(model, img):
     imgs = np.array([img])
     res = model.predict(imgs)
     index = np.argmax(res)
-    #print(index)
     return str(index)
 
 # Keep looping to get a live stream
